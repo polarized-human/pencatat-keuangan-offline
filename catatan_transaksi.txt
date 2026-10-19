@@ -1,0 +1,17 @@
+# CATATAN KAS UMKM FOTO COPY & PRINT (TEXT FORMAT)
+# Terakhir diperbarui: 2026-10-13
+
+[REKAP_KAS]
+Unit Usaha: Berkah Fotocopy & Digital Printing
+Format: TAB-SEPARATED ATAU PIPE-SEPARATED
+
+[TRANSAKSI]
+ID | Tanggal | Tipe | Kategori | Keterangan | Nominal
+TRX-1728821001 | 2026-10-13 | PEMASUKAN | print | Print Skripsi Berwarna 45 Lembar & Jilid Mika | 75000
+TRX-1728821002 | 2026-10-13 | PEMASUKAN | fotocopy | Fotocopy Modul Materi Pelatihan 120 Lembar | 36000
+TRX-1728821003 | 2026-10-13 | PENGELUARAN | kertas | Beli Kertas HVS SiDU A4 75gsm (2 Rim) | 110000
+TRX-1728821004 | 2026-10-13 | PEMASUKAN | scan | Scan Dokumen Ijazah & Cetak Pas Foto 3x4 | 25000
+TRX-1728821005 | 2026-10-13 | PENGELUARAN | tinta_toner | Isi Ulang Tinta Printer Hitam & Cyan | 85000
+TRX-1728821006 | 2026-10-13 | PEMASUKAN | atk | Penjualan Stopmap Folio, Pulpen, & Amplop Coklat | 22000
+TRX-1728821007 | 2026-10-13 | PEMASUKAN | jilid_laminating | Jilid Hardcover Tugas Akhir Mahasiswa | 60000
+TRX-1728821008 | 2026-10-13 | PENGELUARAN | listrik_operasional | Token Listrik Operasional Mesin Fotocopy | 100000

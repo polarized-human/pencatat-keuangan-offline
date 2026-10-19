@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kas UMKM Foto Copy & Print (Pemasukan, Pengeluaran & File Sync)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">🖨️</div>
+        <div>
+          <h1>Kas UMKM Foto Copy & Print</h1>
+          <p class="subtitle">Pencatatan Pemasukan & Pengeluaran Lokal (Terhubung File Catatan MD/TXT)</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="storage-status">
+          <span class="status-dot"></span>
+          <span id="cacheStatusText">LocalStorage & Offline Aktif</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Bar Sinkronisasi File Catatan Direktori -->
+    <section class="sync-bar">
+      <div class="sync-info">
+        <span class="sync-icon">📁</span>
+        <div>
+          <span>Sinkronisasi Berkas: <strong>catatan_transaksi.md</strong> / <strong>.txt</strong></span>
+          <p class="stat-hint" id="syncStatusHint">Data tersimpan di penyimpanan lokal browser & dapat disinkronkan ke berkas direktori</p>
+        </div>
+      </div>
+      <div class="sync-buttons">
+        <button id="loadLocalFileBtn" class="btn btn-secondary" title="Muat data terbaru langsung dari file catatan_transaksi.md di folder">
+          🔄 Muat File Direktori
+        </button>
+        <button id="importFileBtn" class="btn btn-secondary" title="Pilih file .md atau .txt dari komputer Anda">
+          📂 Impor MD / TXT
+        </button>
+        <button id="exportMdBtn" class="btn btn-success-outline" title="Simpan data saat ini menjadi file catatan_transaksi.md">
+          💾 Unduh Catatan (.md)
+        </button>
+        <!-- Input file tersembunyi untuk impor file lokal -->
+        <input type="file" id="hiddenFileInput" accept=".md,.txt" style="display: none;">
+      </div>
+    </section>
+
+    <!-- Ringkasan Statistik Keuangan UMKM -->
+    <section class="stats-grid">
+      <div class="stat-card income-card">
+        <span class="stat-label">Total Pemasukan</span>
+        <h2 id="totalIncome" class="stat-value text-success">Rp 0</h2>
+        <span id="incomeHint" class="stat-hint">0 transaksi masuk</span>
+      </div>
+
+      <div class="stat-card expense-card">
+        <span class="stat-label">Total Pengeluaran</span>
+        <h2 id="totalExpense" class="stat-value text-danger">Rp 0</h2>
+        <span id="expenseHint" class="stat-hint">0 transaksi keluar</span>
+      </div>
+
+      <div class="stat-card balance-card">
+        <span class="stat-label">Saldo / Laba Bersih</span>
+        <h2 id="netBalance" class="stat-value">Rp 0</h2>
+        <span id="balanceStatusHint" class="stat-hint">Kondisi kas seimbang</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Total Transaksi</span>
+        <h2 id="totalCount" class="stat-value">0</h2>
+        <span id="totalDetailHint" class="stat-hint">Semua rekaman kas</span>
+      </div>
+    </section>
+
+    <!-- Konten Utama: Form Transaksi & Riwayat -->
+    <main class="main-content">
+      <!-- Panel Kiri: Form Input Transaksi Fotocopy & Print -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h3>Catat Transaksi Kas</h3>
+          <p class="section-desc">Pemasukan fotocopy & print atau pengeluaran operasional</p>
+        </div>
+
+        <form id="cashflowForm">
+          <!-- Toggle Pemasukan / Pengeluaran -->
+          <div class="type-toggle-group">
+            <button type="button" class="type-toggle-btn active income" id="btnTypeIncome">
+              🟢 Pemasukan (Kas Masuk)
+            </button>
+            <button type="button" class="type-toggle-btn expense" id="btnTypeExpense">
+              🔴 Pengeluaran (Kas Keluar)
+            </button>
+          </div>
+          <input type="hidden" id="itemType" value="pemasukan">
+
+          <div class="form-group">
+            <label for="itemTitle">Nama Transaksi / Keterangan</label>
+            <input type="text" id="itemTitle" placeholder="Misal: Print Skripsi 40 Lembar, Fotocopy Soal, Beli Kertas..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="itemCategory">Kategori</label>
+              <select id="itemCategory" required>
+                <!-- Opsi kategori diisi secara dinamis sesuai tipe terpilih -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="itemAmount">Nominal (Rp)</label>
+              <input type="number" id="itemAmount" placeholder="Contoh: 35000" min="1" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="itemDate">Tanggal Transaksi</label>
+            <input type="date" id="itemDate" required>
+          </div>
+
+          <div class="form-group checkbox-group" id="autoReceiptGroup">
+            <label class="checkbox-label" for="autoShowReceipt">
+              <input type="checkbox" id="autoShowReceipt" checked>
+              <span>🧾 Otomatis buat receipt untuk konsumen setelah simpan</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span id="submitBtnText">➕ Simpan & Buat Receipt Konsumen</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Panel Kanan: Riwayat Kas Transaksi -->
+      <section class="card list-card">
+        <div class="card-header list-header-actions">
+          <div>
+            <h3>Buku Kas Harian</h3>
+            <p class="section-desc">Riwayat transaksi UMKM fotocopy & print (Tersimpan lokal)</p>
+          </div>
+          <button id="clearAllBtn" class="btn btn-danger-outline" title="Hapus seluruh rekaman transaksi">
+            🗑️ Reset Data
+          </button>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Cari keterangan / transaksi...">
+          </div>
+          <div class="filter-box">
+            <select id="filterType">
+              <option value="all">Semua Tipe</option>
+              <option value="pemasukan">🟢 Pemasukan</option>
+              <option value="pengeluaran">🔴 Pengeluaran</option>
+            </select>
+          </div>
+          <div class="filter-box-category">
+            <select id="filterCategory">
+              <option value="all">Semua Kategori</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- List Container -->
+        <div class="transaction-list-wrapper">
+          <ul id="transactionList" class="transaction-list">
+            <!-- Diisi secara dinamis melalui app.js -->
+          </ul>
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">🖨️</div>
+            <h4>Belum ada transaksi kas tercatat</h4>
+            <p>Mulai tambahkan transaksi penerimaan jasa atau belanja operasional fotocopy & print Anda.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Pencatat Kas UMKM Foto Copy & Print &bull; Penyimpanan Lokal (LocalStorage, Cache API & Markdown Sync)</p>
+    </footer>
+  </div>
+
+  <!-- Modal Bukti Pembelian / Nota Struk Kasir -->
+  <div id="receiptModal" class="receipt-modal hidden">
+    <div class="receipt-modal-overlay" id="receiptModalOverlay"></div>
+    <div class="receipt-modal-wrapper">
+      <div class="receipt-modal-actions no-print">
+        <button id="printReceiptBtn" class="btn btn-primary btn-print-action">
+          🖨️ Cetak / Print Struk
+        </button>
+        <button id="closeReceiptBtn" class="btn btn-secondary">
+          ✖️ Tutup
+        </button>
+      </div>
+
+      <!-- Kertas Struk / Nota Fisik -->
+      <div id="receiptPaper" class="receipt-paper">
+        <div class="receipt-header">
+          <div class="receipt-brand">BERKAH FOTO COPY & PRINT</div>
+          <div class="receipt-subtitle">Jasa Fotocopy, Digital Printing, Jilid & ATK</div>
+          <div class="receipt-address">Jl. Percetakan Raya &bull; Layanan Cepat & Berkualitas</div>
+          <div class="receipt-divider">================================</div>
+          <div class="receipt-title" id="receiptTypeLabel">BUKTI PEMBAYARAN KAS</div>
+        </div>
+
+        <div class="receipt-meta">
+          <div class="receipt-row">
+            <span>No. Nota:</span>
+            <strong id="receiptId">TRX-0000000</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Tanggal:</span>
+            <span id="receiptDate">2026-10-13</span>
+          </div>
+          <div class="receipt-row">
+            <span>Tipe Kas:</span>
+            <span id="receiptKasType">Pemasukan</span>
+          </div>
+          <div class="receipt-row">
+            <span>Kategori:</span>
+            <span id="receiptCategory">Print Dokumen</span>
+          </div>
+        </div>
+
+        <div class="receipt-divider">--------------------------------</div>
+
+        <div class="receipt-body">
+          <div class="receipt-item-label">Keterangan / Rincian:</div>
+          <div class="receipt-item-title" id="receiptTitle">Print Skripsi 45 Lembar & Jilid</div>
+          <div class="receipt-row receipt-item-price">
+            <span>Nominal:</span>
+            <strong id="receiptAmount">Rp 75.000</strong>
+          </div>
+        </div>
+
+        <div class="receipt-divider">================================</div>
+
+        <div class="receipt-total-section">
+          <div class="receipt-row receipt-grand-total">
+            <span>TOTAL:</span>
+            <strong id="receiptTotalPay">Rp 75.000</strong>
+          </div>
+          <div class="receipt-badge-status" id="receiptBadgeStatus">*** LUNAS ***</div>
+        </div>
+
+        <div class="receipt-divider">--------------------------------</div>
+
+        <div class="receipt-footer">
+          <p>Terima kasih atas kunjungan Anda!</p>
+          <p>Periksa kembali hasil cetakan sebelum meninggalkan kasir.</p>
+          <small>Sistem Kas Lokal UMKM Foto Copy & Print</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifikasi Ringan -->
+  <div id="toastNotice" class="toast-notice"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
